@@ -1,0 +1,16 @@
+#module
+#defcfunc peek24 var prm_0,int prm_1
+return (lpeek(prm_0,prm_1)&0xFFFFFF)
+#deffunc poke24 var prm_0,int prm_1,int prm_2
+poke prm_0,prm_1+0,(prm_2>>(8*0))&0xFF
+poke prm_0,prm_1+1,(prm_2>>(8*1))&0xFF
+poke prm_0,prm_1+2,(prm_2>>(8*2))&0xFF
+return
+#global
+sdim romdata,0x400000
+dupptr uprg,varptr(romdata)+0x100000,0x300000,2
+bload "os.rom",romdata
+poke24 romdata,0x100,0x100000
+bload "program.bin",uprg
+bsave "os-kit.rom",romdata
+end

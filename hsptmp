@@ -1,0 +1,10 @@
+sdim romdata,0x400000
+dupptr uprg,varptr(romdata)+0x110080,0x2eff80,2
+dupptr uprg2,varptr(romdata)+0x111680,0x2eff80-0x1600,2
+bload "os-kit.rom",romdata
+memset uprg,0xe5,(128*1024)-128,0
+bload "cpm2.2\\eZ80-CPM.bin",uprg
+//bload "CPM.SYS",uprg
+bload "cpmbios.bin",uprg2
+bsave "os-kit.rom",romdata
+end

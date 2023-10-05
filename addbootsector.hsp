@@ -1,0 +1,6 @@
+sdim romdata,0x400000
+dupptr uprg,varptr(romdata)+0x110000,0x2f0000,2
+bload "os-kit.rom",romdata
+bload "bootsector.bin",uprg
+bsave "os-kit.rom",romdata
+end

@@ -1,0 +1,5 @@
+sdim romdata,0x400000
+memset romdata,255,0x400000,0
+bload "kernel.bin",romdata
+bsave "os.rom",romdata
+end
