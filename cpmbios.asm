@@ -222,7 +222,7 @@ conin_crt_:
 	ld.lil a,(0d19510h)
 	bit 1,a
 	jr z,conin_crt_
-	res 0,a
+	res 1,a
 	ld.lil (0d19510h),a
 	ld a,13
 	;ld.lil a,(0d19511h)

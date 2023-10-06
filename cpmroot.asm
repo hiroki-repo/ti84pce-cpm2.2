@@ -17,14 +17,25 @@ conout_:
 	jp renderx
 keyboardthread:
 	;ld sp,0d3f000h
-	call RestoreKeyboard
+	xor a,a
+	ld (0F5000Ch),a
+	;call RestoreKeyboard
 keyboardthread_:
+	call RestoreKeyboard
+	ld a,7
+	ld (0F50008h),a
 	ld hl,0F50000h
-	ld (hl),2      ; Set Single Scan mode
+	;ld (hl),2      ; Set Single Scan mode
+	ld (hl),3
 	xor a,a
 keyboardthread_scan_wait:
-	cp a,(hl)      ; Wait for Idle mode
-	jr nz,keyboardthread_scan_wait
+	;cp a,(hl)      ; Wait for Idle mode
+	;jr nz,keyboardthread_scan_wait
+keyboardthread_scan_wait_:
+	;ld a,(0F50008h)
+	;bit 2,a
+	;jr z,keyboardthread_scan_wait_
+keyboardthread______:
 	ld hl,0F50010h
 	ld de,0d19500h
 keyboardthread__:
@@ -41,14 +52,32 @@ keyboardthread____:
 	inc hl
 	inc hl
 	ld a,l
-	cp a,20
+	cp a,20h
 	jr nz,keyboardthread__
 	ld hl,0d19510h
+	bit 1,(hl)
+	jr z,keyboardthread______
 	set 0,(hl)
 keyboardthread___:
-	bit 0,(hl)
+	bit 1,(hl)
 	jr nz,keyboardthread___
+keyboardthread_____:
 	res 1,(hl)
+keyboardthread________:
+	ld d,0
+	ld hl,0F50010h
+keyboardthread_______:
+	ld a,(hl)
+	or a,d
+	ld d,a
+	inc hl
+	inc hl
+	ld a,l
+	cp a,20h
+	jr nz,keyboardthread_______
+	ld a,d
+	and a,a
+	jr nz,keyboardthread________
 	;jr keyboardthread
 	jr keyboardthread_
 RestoreKeyboard:
