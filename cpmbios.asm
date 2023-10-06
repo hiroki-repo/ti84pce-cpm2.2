@@ -176,6 +176,9 @@ const_crt:
 	ld (cpmbios_hlbak),hl
 	;ld c,0
 	;rst.lil 8h
+	ld.lil a,(0d19510h)
+	bit 1,a
+	jr nz,const_tty_
 	ld a,0h
 	ld bc,(cpmbios_bcbak)
 	ld de,(cpmbios_debak)
@@ -216,7 +219,13 @@ conin_crt:
 	;ld c,1
 	;rst.lil 8h
 conin_crt_:
-	jr conin_crt_
+	ld.lil a,(0d19510h)
+	bit 1,a
+	jr z,conin_crt_
+	res 0,a
+	ld.lil (0d19510h),a
+	ld a,13
+	;ld.lil a,(0d19511h)
 	ld bc,(cpmbios_bcbak)
 	ld de,(cpmbios_debak)
 	ld hl,(cpmbios_hlbak)

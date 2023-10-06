@@ -15,6 +15,59 @@ conout_:
 	jp z,renderx_zerocols
 	;Okey we rend a character.
 	jp renderx
+keyboardthread:
+	;ld sp,0d3f000h
+	call RestoreKeyboard
+keyboardthread_:
+	ld hl,0F50000h
+	ld (hl),2      ; Set Single Scan mode
+	xor a,a
+keyboardthread_scan_wait:
+	cp a,(hl)      ; Wait for Idle mode
+	jr nz,keyboardthread_scan_wait
+	ld hl,0F50010h
+	ld de,0d19500h
+keyboardthread__:
+	ld a,(hl)
+	ld (de),a
+	and a,a
+	jr z,keyboardthread____
+	push hl
+	ld hl,0d19510h
+	set 1,(hl)
+	pop hl
+keyboardthread____:
+	inc de
+	inc hl
+	inc hl
+	ld a,l
+	cp a,20
+	jr nz,keyboardthread__
+	ld hl,0d19510h
+	set 0,(hl)
+keyboardthread___:
+	bit 0,(hl)
+	jr nz,keyboardthread___
+	res 1,(hl)
+	;jr keyboardthread
+	jr keyboardthread_
+RestoreKeyboard:
+	ld hl,0F50000h
+	xor a		; Mode 0
+	ld (hl),a
+	inc l		; 0F50001h
+	ld (hl),15	; Wait 15*256 APB cycles before scanning each row
+	inc l		; 0F50002h
+	xor a
+	ld (hl),a
+	inc l		; 0F50003h
+	ld (hl),15	; Wait 15 APB cycles before each scan
+	inc l		; 0F50004h
+	ld a,8		; Number of rows to scan
+	ld (hl),a
+	inc l		; 0F50005h
+	ld (hl),a	; Number of columns to scan
+	ret
 init:
 	ld hl,7fffh
 	ld (0d19400h+(3*3)),hl
@@ -31,6 +84,22 @@ init:
 	ldir
 	ld a,0d0h
 	ld mb,a
+	ld hl,0
+	add hl,sp
+	ld sp,0d3f000h
+	ld de,keyboardthread
+	push de
+	ld sp,hl
+	ld hl,0d3f000h-4
+	ld (hl),3
+	ld sp,0d40000h
+	ld de,0
+	ld a,0
+	push hl
+	push hl
+	rst.lil 8h
+	pop hl
+	pop hl
 	call.is 08000h
 lplp:	jr lplp
 
